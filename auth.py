@@ -2,7 +2,7 @@ import bcrypt
 import os
 
 # File to store users
-USER_DATA_FILE = "users.txt"
+USER_DATA_FILE = "DATA/users.txt"
 
 
 # -----------------------------

@@ -27,7 +27,10 @@ The goal is to demonstrate understanding of security fundamentals before moving 
 - `auth.py` – main program  
 - `users.txt` – user data store  
 
-## How to Run  
+## How to Run
+
+```bash
+python3 auth.py
 
 
 ## Requirements  

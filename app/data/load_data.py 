@@ -1,0 +1,18 @@
+from app.data.database import DatabaseManager
+from pathlib import Path
+
+print("RUNNING FROM DIRECTORY:", Path().resolve())
+
+# Build correct absolute path to DATA/
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = BASE_DIR / "DATA"
+
+db = DatabaseManager()
+db.create_tables()
+
+# Load CSVs using the unified loader
+db.load_csv_to_table(DATA_DIR / "cyber_incidents.csv", "cyber_incidents")
+db.load_csv_to_table(DATA_DIR / "datasets_metadata.csv", "datasets_metadata")
+db.load_csv_to_table(DATA_DIR / "it_tickets.csv", "it_tickets")
+
+print("All CSV data loaded successfully!")
