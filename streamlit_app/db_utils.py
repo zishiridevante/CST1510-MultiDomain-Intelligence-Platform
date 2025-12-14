@@ -3,13 +3,13 @@ from pathlib import Path
 import bcrypt
 
 # ----------------------------------
+# PATH FIXING
 # ----------------------------------
-
 # This file lives in: streamlit_app/
-#              DATA/intelligence_platform.db
+# DB lives in:       DATA/intelligence_platform.db
 
-BASE_DIR = Path(__file__).resolve().parent   # → streamlit_app/
-PROJECT_ROOT = BASE_DIR.parent               # → CW2_M01040790_CST1510/
+BASE_DIR = Path(__file__).resolve().parent       # → streamlit_app/
+PROJECT_ROOT = BASE_DIR.parent                   # → CW2_M01040790_CST1510/
 DB_PATH = (PROJECT_ROOT / "DATA" / "intelligence_platform.db").resolve()
 
 
@@ -36,25 +36,27 @@ def verify_user(username, password):
     stored_hash = row["password_hash"]
 
     if bcrypt.checkpw(password.encode(), stored_hash.encode()):
-        return True, row
+        return True, row  # return full row, including role
     else:
         return False, "Incorrect password"
 
 
 # --------------------------
-# REGISTER NEW USER
+# REGISTER NEW USER (NOW SUPPORTS ROLE)
 # --------------------------
-def register_user(username, password):
+def register_user(username, password, role):
     conn = get_connection()
     cursor = conn.cursor()
 
+    # Hash the password
     password_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
     try:
         cursor.execute("""
-            INSERT INTO users (username, password_hash)
-            VALUES (?, ?)
-        """, (username, password_hash))
+            INSERT INTO users (username, password_hash, role)
+            VALUES (?, ?, ?)
+        """, (username, password_hash, role))
+
         conn.commit()
         return True, "User created successfully!"
 

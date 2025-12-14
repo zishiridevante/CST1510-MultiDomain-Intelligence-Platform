@@ -3,15 +3,24 @@ import sqlite3
 from pathlib import Path
 import pandas as pd
 
-# ---------------------------
-# AUTHENTICATION CHECK
-# ---------------------------
-if "authenticated" not in st.session_state or not st.session_state["authenticated"]:
-    st.warning("You must log in first.")
-    st.stop()
+# -----------------------------------------
+# PAGE CONFIG (must be FIRST Streamlit command)
+# -----------------------------------------
+st.set_page_config(
+    page_title="Intelligence Platform Dashboard",
+    layout="wide"
+)
+from role_utils import require_login
+require_login()
 
 # -----------------------------------------
-# FIXED DATABASE PATH (for Streamlit pages/)
+# ROLE / LOGIN CHECK
+# -----------------------------------------
+from role_utils import require_login
+require_login()   # ensures user must be logged in
+
+# -----------------------------------------
+# FIXED DATABASE PATH
 # -----------------------------------------
 DB_PATH = Path(__file__).resolve().parents[2] / "DATA" / "intelligence_platform.db"
 
@@ -19,13 +28,13 @@ def get_conn():
     return sqlite3.connect(DB_PATH)
 
 # -----------------------------------------
-# PAGE CONFIG
+# LOGOUT BUTTON
 # -----------------------------------------
-st.set_page_config(
-    page_title="Intelligence Platform Dashboard",
-    layout="wide"
-)
+st.sidebar.button("🚪 Logout", on_click=lambda: st.session_state.clear())
 
+# -----------------------------------------
+# PAGE TITLE
+# -----------------------------------------
 st.title("📊 Intelligence Platform Dashboard")
 st.write("Welcome to your central intelligence dashboard. Use the sidebar to navigate between sections.")
 
@@ -43,7 +52,6 @@ datasets_count = conn.execute("SELECT COUNT(*) FROM datasets_metadata").fetchone
 st.subheader("📌 Quick Stats")
 
 col1, col2, col3 = st.columns(3)
-
 col1.metric("Cyber Incidents", cyber_count)
 col2.metric("IT Tickets", tickets_count)
 col3.metric("Datasets Uploaded", datasets_count)
@@ -52,7 +60,6 @@ col3.metric("Datasets Uploaded", datasets_count)
 # CHART 1 — Cyber Incidents by Severity
 # -----------------------------------------
 st.subheader("📊 Cyber Incidents by Severity")
-
 df_cyber = pd.read_sql_query("SELECT severity FROM cyber_incidents", conn)
 
 if not df_cyber.empty:
@@ -65,7 +72,6 @@ else:
 # CHART 2 — IT Tickets by Status
 # -----------------------------------------
 st.subheader("📈 IT Tickets by Status")
-
 df_tickets = pd.read_sql_query("SELECT status FROM it_tickets", conn)
 
 if not df_tickets.empty:
@@ -78,7 +84,6 @@ else:
 # CHART 3 — Dataset Sizes
 # -----------------------------------------
 st.subheader("📂 Dataset Size Overview (Rows)")
-
 df_datasets = pd.read_sql_query("SELECT name, rows FROM datasets_metadata", conn)
 
 if not df_datasets.empty:

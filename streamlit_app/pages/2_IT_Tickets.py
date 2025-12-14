@@ -3,6 +3,13 @@ import sqlite3
 import pandas as pd
 from pathlib import Path
 
+from role_utils import require_role
+require_role("admin")
+
+# LOGOUT BUTTON (Top-right corner)
+st.sidebar.button("🚪 Logout", on_click=lambda: st.session_state.clear())
+
+
 # ---------------------------
 # AUTHENTICATION CHECK
 # ---------------------------
